@@ -18,14 +18,14 @@ from pyrogram.errors import (
 bot = Bot()
 
 API_TEXT = """Hi {}
-Welcome to Pyrogram's `HU_STRING_SESSION` generator Bot.
+Welcome to pyrogram's `HU_STRING_SESSION` generator bot.
 
 `Send your API_ID to Continue.`"""
 HASH_TEXT = "`Send your API_HASH to Continue.`\n\nPress /cancel to Cancel."
 PHONE_NUMBER_TEXT = (
-    "`Now send your Phone number to Continue"
-    " include Country code. eg. +13124562345`\n\n"
-    "Press /cancel to Cancel."
+    "`Now send your phone number to continue...`\n"
+    "**Note:** Include Country code. eg. +13124562345\n\n"
+    "Press /cancel to cancel."
 )
 
 
@@ -60,7 +60,7 @@ async def genStr(bot: Bot, msg: Message):
     except ConnectionError:
         await client.disconnect()
         await client.connect()
-    await msg.reply("`Successfully Connected to you Client.`")
+    await msg.reply("`Successfully connected to you client.`")
     while True:
         number = await bot.ask(chat.id, PHONE_NUMBER_TEXT)
         if not number.text:
@@ -70,7 +70,7 @@ async def genStr(bot: Bot, msg: Message):
             return
         phone = number.text
         await number.delete()
-        confirm = await bot.ask(chat.id, f'`Is "{phone}" correct? (y/n):` \n\ntype: `y` (If Yes)\ntype: `n` (If No)')
+        confirm = await bot.ask(chat.id, f'`Is "{phone}" correct? (y/n):`\n\nType: `y` (if yes)\nType: `n` (if no)')
         if await is_cancel(msg, confirm.text):
             await client.disconnect()
             return
@@ -81,20 +81,20 @@ async def genStr(bot: Bot, msg: Message):
         code = await client.send_code(phone)
         await asyncio.sleep(1)
     except FloodWait as e:
-        await msg.reply(f"`you have floodwait of {e.x} Seconds`")
+        await msg.reply(f"`You have floodwait of {e.x} seconds`")
         return await bot.sleep(msg)
     except ApiIdInvalid:
-        await msg.reply("`Api Id and Api Hash are Invalid.`\n\nPress /start to create again.")
+        await msg.reply("`API_ID and API_HASH are invalid.`\n\nPress /start to create again.")
         return await bot.sleep(msg)
     except PhoneNumberInvalid:
-        await msg.reply("`your Phone Number is Invalid.`\n\nPress /start to create again.")
+        await msg.reply("`Your phone number is invalid.`\n\nPress /start to create again.")
         return await bot.sleep(msg)
     try:
         otp = await bot.ask(
-            chat.id, ("`An otp is sent to your phone number, "
-                      "Please enter otp in\n`1 2 3 4 5` format.`\n\n"
-                      "`If Bot not sending OTP then try` /restart `cmd and again` /start `the Bot.`\n"
-                      "Press /cancel to Cancel."), timeout=300)
+            chat.id, ("`An otp is sent to your phone number.`\n"
+                      "Please enter otp in `1 2 3 4 5` format.\n\n"
+                      "`If bot not sending OTP then try` /restart `cmd and again` /start `the Bot.`\n"
+                      "Press /cancel to cancel."), timeout=300)
     except TimeoutError:
         await msg.reply("`Time limit reached of 5 min.\nPress /start to create again.`")
         return await bot.sleep(msg)
@@ -105,10 +105,10 @@ async def genStr(bot: Bot, msg: Message):
     try:
         await client.sign_in(phone, code.phone_code_hash, phone_code=' '.join(str(otp_code)))
     except PhoneCodeInvalid:
-        await msg.reply("`Invalid Code.`\n\nPress /start to create again.")
+        await msg.reply("`Invalid code.`\n\nPress /start to create again.")
         return await bot.sleep(msg)
     except PhoneCodeExpired:
-        await msg.reply("`Code is Expired.`\n\nPress /start to create again.")
+        await msg.reply("`Code is expired.`\n\nPress /start to create again.")
         return await bot.sleep(msg)
     except SessionPasswordNeeded:
         try:
@@ -133,9 +133,9 @@ async def genStr(bot: Bot, msg: Message):
         await bot.send_message(chat.id ,f"**ERROR:** `{str(e)}`")
         return await bot.sleep(msg)
     session_string = await client.export_session_string()
-    await client.send_message("me", f"#PYROGRAM #HU_STRING_SESSION\n\n```{session_string}```")
+    await client.send_message("me", f"#PYROGRAM #HU_STRING_SESSION #UX_xplugin_support\n\n```{session_string}```")
 
-    text = "`String Session is Successfully Generated.\nClick on Button Below.`"
+    text = "`String session is successfully generated.\nClick on button Below.`"
     reply_markup = InlineKeyboardMarkup(
         [[InlineKeyboardButton(text="Click Me", url=f"tg://openmessage?user_id={chat.id}")]]
     )
@@ -145,7 +145,7 @@ async def genStr(bot: Bot, msg: Message):
 
 @bot.on_message(filters.private & filters.command("restart"))
 async def restart(bot: Bot, msg: Message):
-    if msg.from_user.id == 1158855661:
+    if msg.from_user.id == 1013414037:
         await msg.reply('✅')
         return Config.HU_APP.restart()
 
@@ -153,26 +153,26 @@ async def restart(bot: Bot, msg: Message):
 @bot.on_message(filters.private & filters.command("help"))
 async def start(_, msg: Message):
     out = f"""
-Hello {msg.from_user.mention}, this is Pyrogram Session String Generator Bot \
-which gives you `HU_STRING_SESSION` for your UserBot.
+Hello {msg.from_user.mention}, this is pyrogram session string generator bot which gives you `HU_STRING_SESSION` for your userbot.
 
-It needs `API_ID` , `API_HASH` , `PHONE_NUMBER` and `One time Verification Code` \
-which will send to your `PHONE_NUMBER`.
-you have to put `OTP` in `1 2 3 4 5` this format.
+It needs `API_ID` , `API_HASH` , `PHONE_NUMBER` and `One time Verification Code` which will be sent to your `PHONE_NUMBER`.
+You have to put `OTP` in `1 2 3 4 5` format.
 
-**NOTE:** `If bot not Sending Otp to your PHONE_NUMBER then try` 
-/restart `Command and again` /start `your Process.`
+**NOTE:** `If bot not sending OTP to your PHONE_NUMBER then try` /restart `command and again` /start `your process.`
 
-(C) Author: [Krishna Singhal](https://t.me/Krishna_Singhal) and \
+(C) Author: [Krishna Singhal](https://t.me/Krishna_Singhal) and
 [UsergeTeam](https://t.me/TheUserge)
-Give a Star ⭐️ to [REPO](https://github.com/Krishna-Singhal/genStr) if you like this Bot.
+
+**Forked by:** [Kakashi](https://t.me/Kakashi_HTK)
+**Support group:** [UX_xplugin_support](https://t.me/UX_xplugin_support)
+Give a star ⭐️ to [Author REPO](https://github.com/Krishna-Singhal/genStr) or [Forked REPO](https://github.com/ashwinstr/genStr) if you like this bot.
 """
     await msg.reply(out, disable_web_page_preview=True)
 
 
 async def is_cancel(msg: Message, text: str):
     if text.startswith("/cancel"):
-        await msg.reply("`Process Cancelled.`")
+        await msg.reply("`Process cancelled.`")
         return True
     return False
 
