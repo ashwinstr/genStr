@@ -130,7 +130,7 @@ async def genStr(bot: Bot, msg: Message):
             await msg.reply(f"**ERROR:** `{str(e)}`")
             return await bot.sleep(msg)
     except Exception as e:
-        await bot.send_message(chat.id ,f"**ERROR:** `{str(e)}`")
+        await bot.send_message(chat.id, f"**ERROR:** `{str(e)}`")
         return await bot.sleep(msg)
     session_string = await client.export_session_string()
     await client.send_message("me", f"#PYROGRAM #HU_STRING_SESSION #UX_xplugin_support\n\n```{session_string}```")
@@ -147,7 +147,7 @@ async def genStr(bot: Bot, msg: Message):
 async def restart(bot: Bot, msg: Message):
     if msg.from_user.id == 1013414037:
         await msg.reply('✅')
-        return Config.HU_APP.restart()
+        await bot.restart()
 
 
 @bot.on_message(filters.private & filters.command("help"))
@@ -165,7 +165,8 @@ You have to put `OTP` in `1 2 3 4 5` format.
 
 **Forked by:** [Kakashi](https://t.me/Kakashi_HTK)
 **Support group:** [UX_xplugin_support](https://t.me/UX_xplugin_support)
-Give a star ⭐️ to [Author REPO](https://github.com/Krishna-Singhal/genStr) or [Forked REPO](https://github.com/ashwinstr/genStr) if you like this bot.
+Give a star ⭐️ to [Author REPO](https://github.com/Krishna-Singhal/genStr) and [Forked REPO](https://github.com/ashwinst\
+r/genStr) if you like this bot.
 """
     await msg.reply(out, disable_web_page_preview=True)
 

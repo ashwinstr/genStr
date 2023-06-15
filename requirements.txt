@@ -1,5 +1,5 @@
-heroku3
 pymongo
-pyrogram==1.3.5
-pyromod
+pyrogram>=2.0.0
+pyromod==1.5.0
+python-dotenv
 TgCrypto

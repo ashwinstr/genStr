@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# config.env
+*.env
+
+# session files
+*.session*

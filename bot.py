@@ -1,40 +1,45 @@
 import os
-import asyncio
-import json
-from typing import Dict, Optional, List
+from dotenv import load_dotenv
 
-from heroku3 import from_key
 from pyrogram import Client
+from pyrogram.types import Message
 from pyromod import listen
 
-from pyrogram.errors import MessageNotModified
+
+if os.path.isfile("config.env"):
+    load_dotenv("config.env")
 
 
 class Config:
     API_ID = int(os.environ.get("API_ID", 0))
     API_HASH = os.environ.get("API_HASH", None)
     BOT_TOKEN = os.environ.get("BOT_TOKEN", None)
-    APP_NAME = os.environ.get("APP_NAME", None)
-    API_KEY = os.environ.get("API_KEY", None)
-    HU_APP = from_key(API_KEY).apps()[APP_NAME]
+    LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", 0))
 
 
 class Bot(Client):
     def __init__(self):
         kwargs = {
+            'name': 'session_bot',
+            'in_memory': True,
             'api_id': Config.API_ID,
             'api_hash': Config.API_HASH,
-            'session_name': ':memory:',
             'bot_token': Config.BOT_TOKEN
         }
         super().__init__(**kwargs)
 
     async def start(self):
         await super().start()
+        await self.send_message(Config.LOG_CHANNEL_ID, "`Started session string bot successfully...`")
+        print("Bot has been started...")
 
-    async def stop(self):
+    async def stop(self, block: bool = True):
         await super().stop()
 
-    async def sleep(self, msg):
-        await msg.reply("`Sleeping for (10) Seconds.`")
-        Config.HU_APP.restart()
+    async def sleep(
+        self: 'Client',
+        msg: Message,
+        block: bool = True
+    ):
+        await msg.reply("`Sleeping for 10 seconds.`")
+        await super().restart(block)
