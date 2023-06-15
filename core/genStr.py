@@ -1,24 +1,18 @@
-import os
-import json
-import time
 import asyncio
-
-from bot import Bot, Config
-from pyromod import listen
 from asyncio.exceptions import TimeoutError
 
 from pyrogram import filters, Client
-from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import (
     SessionPasswordNeeded, FloodWait,
     PhoneNumberInvalid, ApiIdInvalid,
     PhoneCodeInvalid, PhoneCodeExpired
 )
+from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 
-bot = Bot()
+from core.bot import bot, Bot
 
 API_TEXT = """Hi {}
-Welcome to pyrogram's `HU_STRING_SESSION` generator bot.
+Welcome to pyrogram's `STRING_SESSION` generator bot.
 
 `Send your API_ID to Continue.`"""
 HASH_TEXT = "`Send your API_HASH to Continue.`\n\nPress /cancel to Cancel."
@@ -29,7 +23,7 @@ PHONE_NUMBER_TEXT = (
 )
 
 
-@bot.on_message(filters.private & filters.command("start"))
+@bot.on_message(filters.private & filters.command("start"), group=-1)
 async def genStr(bot: Bot, msg: Message):
     chat = msg.chat
     api = await bot.ask(
@@ -39,7 +33,7 @@ async def genStr(bot: Bot, msg: Message):
         return
     try:
         int(api.text)
-    except Exception:
+    except Exception as e:
         await api.delete()
         await msg.reply("`API ID Invalid.`\nPress /start to create again.")
         return
@@ -70,18 +64,19 @@ async def genStr(bot: Bot, msg: Message):
             return
         phone = number.text
         await number.delete()
-        confirm = await bot.ask(chat.id, f'`Is "{phone}" correct? (y/n):`\n\nType: `y` (if yes)\nType: `n` (if no)')
+        confirm: Message = await bot.ask(chat.id, f'`Is "{phone}" correct? (y/n):`\n\nType: `y` (if yes)\nType: `n` ('
+                                                  f'if no)')
         if await is_cancel(msg, confirm.text):
             await client.disconnect()
             return
-        if "y" in confirm.text.lower():
+        if confirm.text.lower() == "y":
             await confirm.delete()
             break
     try:
         code = await client.send_code(phone)
         await asyncio.sleep(1)
     except FloodWait as e:
-        await msg.reply(f"`You have floodwait of {e.x} seconds`")
+        await msg.reply(f"`You have FloodWait of {e.value} seconds`")
         return await bot.sleep(msg)
     except ApiIdInvalid:
         await msg.reply("`API_ID and API_HASH are invalid.`\n\nPress /start to create again.")
@@ -114,10 +109,11 @@ async def genStr(bot: Bot, msg: Message):
         try:
             two_step_code = await bot.ask(
                 chat.id, 
-                "`This account have two-step verification code.\nPlease enter your second factor authentication code.`\nPress /cancel to Cancel.",
+                "`This account have two-step verification code.\nPlease enter your second factor authentication code.`"
+                "\nPress /cancel to Cancel.",
                 timeout=300
             )
-        except TimeoutError:
+        except asyncio.TimeoutError:
             await msg.reply("`Time limit reached of 5 min.\n\nPress /start to create again.`")
             return await bot.sleep(msg)
         if await is_cancel(msg, two_step_code.text):
@@ -133,7 +129,7 @@ async def genStr(bot: Bot, msg: Message):
         await bot.send_message(chat.id, f"**ERROR:** `{str(e)}`")
         return await bot.sleep(msg)
     session_string = await client.export_session_string()
-    await client.send_message("me", f"#PYROGRAM #HU_STRING_SESSION #UX_xplugin_support\n\n```{session_string}```")
+    await client.send_message("me", f"**VenomX**\n#PYROGRAM #STRING_SESSION #UX_xplugin_support\n\n```{session_string}```")
 
     text = "`String session is successfully generated.\nClick on button Below.`"
     reply_markup = InlineKeyboardMarkup(
@@ -143,14 +139,14 @@ async def genStr(bot: Bot, msg: Message):
     return await bot.sleep(msg)
 
 
-@bot.on_message(filters.private & filters.command("restart"))
+@bot.on_message(filters.private & filters.command("restart"), group=0)
 async def restart(bot: Bot, msg: Message):
     if msg.from_user.id == 1013414037:
         await msg.reply('✅')
         await bot.restart()
 
 
-@bot.on_message(filters.private & filters.command("help"))
+@bot.on_message(filters.private & filters.command("help"), group=1)
 async def start(_, msg: Message):
     out = f"""
 Hello {msg.from_user.mention}, this is pyrogram session string generator bot which gives you `HU_STRING_SESSION` for your userbot.
@@ -164,9 +160,8 @@ You have to put `OTP` in `1 2 3 4 5` format.
 [UsergeTeam](https://t.me/TheUserge)
 
 **Forked by:** [Kakashi](https://t.me/Kakashi_HTK)
-**Support group:** [UX_xplugin_support](https://t.me/UX_xplugin_support)
-Give a star ⭐️ to [Author REPO](https://github.com/Krishna-Singhal/genStr) and [Forked REPO](https://github.com/ashwinst\
-r/genStr) if you like this bot.
+**Support group:** [VenomX_support](https://t.me/UX_xplugin_support)
+Give a star ⭐️ to [Author REPO](https://github.com/Krishna-Singhal/genStr) and [Forked REPO](https://github.com/ashwinstr/genStr) if you like this bot.
 """
     await msg.reply(out, disable_web_page_preview=True)
 
