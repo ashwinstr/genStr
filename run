@@ -10,4 +10,4 @@ server() {
 }
 
 server
-python3.10 -m jutsu
+python3.10 -m genStr
