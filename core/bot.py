@@ -5,16 +5,10 @@ from pyrogram import Client
 from pyrogram.types import Message
 from pyromod import listen
 
+from helpers.config import Config
 
-if os.path.isfile("config.env"):
-    load_dotenv("config.env")
-
-
-class Config:
-    API_ID = int(os.environ.get("API_ID", 0))
-    API_HASH = os.environ.get("API_HASH", None)
-    BOT_TOKEN = os.environ.get("BOT_TOKEN", None)
-    LOG_CHANNEL_ID = int(os.environ.get("LOG_CHANNEL_ID", 0))
+if os.path.isfile("../config.env"):
+    load_dotenv("../config.env")
 
 
 class Bot(Client):
@@ -38,8 +32,10 @@ class Bot(Client):
 
     async def sleep(
         self: 'Client',
-        msg: Message,
-        block: bool = True
+        msg: Message
     ):
         await msg.reply("`Sleeping for 10 seconds.`")
-        await super().restart(block)
+        await super().restart()
+
+
+bot = Bot()
